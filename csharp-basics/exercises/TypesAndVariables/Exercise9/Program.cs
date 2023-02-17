@@ -18,7 +18,6 @@ namespace Exercise9
             Console.WriteLine("Input seconds:");
             int seconds = Convert.ToInt32(Console.ReadLine());
 
-
             int timeInSeconds = hours * 3600 + minutes * 60 + seconds;
 
             float metersPerSecond = (float)distance / timeInSeconds;
@@ -27,10 +26,9 @@ namespace Exercise9
 
             float milesPerHour = (float)distance / 1609 / ((float)timeInSeconds / 3600);
 
-
             Console.WriteLine($"Your speed in meters/second is {metersPerSecond}");
             Console.WriteLine($"Your speed in km/h is {kmPerHour}");
-            Console.WriteLine($"Your speed in miles/h is {milesPerHour}");
+            Console.WriteLine($"Your speed in miles/h is {milesPerHour:F8}");
             Console.ReadKey();
         }
     }

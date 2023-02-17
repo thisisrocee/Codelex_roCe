@@ -11,8 +11,6 @@ namespace SadFor
 
         private static void Test1()
         {
-            //fixme so I would compile
-            
             for (int i = 0; i < 10; i++)
             {
                 if (Math.Sqrt(i) > 2.5)
@@ -20,7 +18,6 @@ namespace SadFor
                     Console.WriteLine(i);
                 }
             }
-            
         }
     }
 }

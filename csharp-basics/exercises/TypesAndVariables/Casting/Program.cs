@@ -25,8 +25,7 @@ namespace Casting
 
             int f = int.Parse(a);
 
-            //fixme - should be 15 :|
-            double sum = f + b + c + d + e;
+            int sum = (int)(f + b + c + d + e);
             Console.WriteLine(sum);
         }
 
@@ -40,8 +39,7 @@ namespace Casting
 
             int f = int.Parse(a);
 
-            //fixme - should be 15.5 :| 
-            double sum = f + b + c + d + e;
+            float sum = (float)(f + b + c + d + e);
             Console.WriteLine(Math.Round(sum, 1));
         }
     }
