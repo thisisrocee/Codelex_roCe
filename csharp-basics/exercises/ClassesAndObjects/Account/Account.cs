@@ -1,4 +1,6 @@
-﻿namespace Account
+﻿using System;
+
+namespace Account
 {
     class Account
     {
@@ -7,22 +9,18 @@
 
         public Account(string v1, double v2)
         {
-            
+            _name = v1;
+            _money = v2;
         }
 
-        public double Withdrawal(double i)
+        public void Withdrawal(double i)
         {
-            return i;
+            _money -= i;
         }
 
         public void Deposit(double i)
         {
-            
-        }
-
-        public double Balance()
-        {
-            return _money;
+            _money += i;
         }
 
         public override string ToString()
@@ -30,10 +28,18 @@
             return $"{_name}: {_money}";
         }
 
-        public string Name
+        public static void Transfer(Account from, Account to, double howMuch)
         {
-            get => _name;
-            set => _name = value;
+            Console.WriteLine($"From account (before): {from._name}, {from._money}");
+            Console.WriteLine($"To account (before): {to._name}, {to._money}");
+
+            from._money -= howMuch;
+            to._money += howMuch;
+
+            Console.WriteLine();
+            Console.WriteLine($"    From account (after): {from._name}, {from._money}");
+            Console.WriteLine($"    To account (after): {to._name}, {to._money}");
+            Console.WriteLine();
         }
     }
 }
