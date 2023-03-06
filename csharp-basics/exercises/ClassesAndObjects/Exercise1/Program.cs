@@ -4,52 +4,30 @@ namespace Exercise1
 {
     class Product
     {
-        private string Name;
-        private double Price;
-        private int Amount;
+        private string _name;
+        private double _price;
+        private int _amount;
 
         public Product(string name, double priceAtStart, int amountAtStart)
         {
-            Name = name;
-            Price = priceAtStart;
-            Amount = amountAtStart;
+            _name = name;
+            _price = priceAtStart;
+            _amount = amountAtStart;
         }
 
         public void PrintProduct()
         {
-            Console.WriteLine($"{Name}, price {Price:F2}, amount {Amount}");
+            Console.WriteLine($"{_name}, price {_price:F2}, amount {_amount}");
         }
 
         public void ChangePrice(double newPrice)
         {
-            Price = newPrice;
+            _price = newPrice;
         }
 
         public void ChangeAmount(int newAmount)
         {
-            Amount = newAmount;
-        }
-    }
-
-    class TestResult
-    {
-        static void Main(string[] args)
-        {
-            var item1 = new Product("Logitech mouse", 70.00, 14);
-            var item2 = new Product("iPhone 5s", 999.99, 3);
-            var item3 = new Product("Epson EB-U05", 440.46, 1);
-
-            item1.PrintProduct();
-            item2.PrintProduct();
-            item3.PrintProduct();
-
-            Console.WriteLine("Changed values:");
-
-            item3.ChangePrice(420.69);
-            item1.ChangeAmount(300);
-
-            item3.PrintProduct();
-            item1.PrintProduct();
+            _amount = newAmount;
         }
     }
 }

@@ -16,12 +16,12 @@ namespace Exercise6
             _sex = sex;
         }
 
-        public void setMother(string mother)
+        public void SetMother(string mother)
         {
             _mother = mother;
         }
 
-        public void setFather(string father)
+        public void SetFather(string father)
         {
             _father = father;
         }

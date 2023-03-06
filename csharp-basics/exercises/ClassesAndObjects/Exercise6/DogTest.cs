@@ -10,23 +10,23 @@ namespace Exercise6
     {
         static void Main(string[] args)
         {
-            Dog max = new Dog("Max", "male");
-            Dog rocky = new Dog("Rocky", "male");
-            Dog sparky = new Dog("Sparky", "male");
-            Dog buster = new Dog("Buster", "male");
-            Dog sam = new Dog("Sam", "male");
-            Dog lady = new Dog("Lady", "female");
-            Dog molly = new Dog("Molly", "female");
-            Dog coco = new Dog("Coco", "female");
+            var max = new Dog("Max", "male");
+            var rocky = new Dog("Rocky", "male");
+            var sparky = new Dog("Sparky", "male");
+            var buster = new Dog("Buster", "male");
+            var sam = new Dog("Sam", "male");
+            var lady = new Dog("Lady", "female");
+            var molly = new Dog("Molly", "female");
+            var coco = new Dog("Coco", "female");
 
-            max.setFather("Rocky");
-            max.setMother("Lady");
-            rocky.setFather("Sam");
-            rocky.setMother("Molly");
-            buster.setFather("Sparky");
-            buster.setMother("Lady");
-            coco.setFather("Buster");
-            coco.setMother("Molly");
+            max.SetFather("Rocky");
+            max.SetMother("Lady");
+            rocky.SetFather("Sam");
+            rocky.SetMother("Molly");
+            buster.SetFather("Sparky");
+            buster.SetMother("Lady");
+            coco.SetFather("Buster");
+            coco.SetMother("Molly");
 
             Console.WriteLine(coco.FathersName());
             Console.WriteLine(sparky.FathersName());

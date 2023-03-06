@@ -34,7 +34,7 @@ namespace VideoStore
 
         public void ReturnVideo(string title)
         {
-            Video video = _videos.Find(v => v.Title == title);
+            var video = _videos.Find(v => v.Title == title);
 
             if (video == null)
             {
@@ -54,7 +54,7 @@ namespace VideoStore
 
         public void TakeUsersRating(double rating, string title)
         {
-            Video video = _videos.Find(v => v.Title == title);
+            var video = _videos.Find(v => v.Title == title);
 
             if (video == null)
             {

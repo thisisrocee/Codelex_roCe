@@ -30,8 +30,22 @@ namespace Account
             Account bAccount = new Account("B account", 0.0);
             Account cAccount = new Account("C account", 0.0);
 
-            Account.Transfer(aAccount, bAccount, 50.0);
-            Account.Transfer(bAccount, cAccount, 25.0);
+            Transfer(aAccount, bAccount, 50.0);
+            Transfer(bAccount, cAccount, 25.0);
+        }
+
+        public static void Transfer(Account from, Account to, double howMuch)
+        {
+            Console.WriteLine($"From account (before): {from.Name}, {from.Money}");
+            Console.WriteLine($"To account (before): {to.Name}, {to.Name}");
+
+            from.Money -= howMuch;
+            to.Money += howMuch;
+
+            Console.WriteLine();
+            Console.WriteLine($"    From account (after): {from.Name}, {from.Money}");
+            Console.WriteLine($"    To account (after): {to.Name}, {to.Money}");
+            Console.WriteLine();
         }
     }
 }

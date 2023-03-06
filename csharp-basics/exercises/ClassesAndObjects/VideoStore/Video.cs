@@ -7,20 +7,20 @@ namespace VideoStore
         public string Title { get; }
         public bool Availability { get; set; }
         public double AverageRating { get; private set; }
-        public int allRatings { get; private set; }
+        public int AllRatings { get; private set; }
 
         public Video(string title)
         {
             Title = title;
             Availability = true;
             AverageRating = 0.0;
-            allRatings = 0;
+            AllRatings = 0;
         }
 
         public void ReceivingRating(double rating)
         {
-            AverageRating = (AverageRating * allRatings + rating) / (allRatings + 1);
-            allRatings++;
+            AverageRating = (AverageRating * AllRatings + rating) / (AllRatings + 1);
+            AllRatings++;
         }
 
         public override string ToString()

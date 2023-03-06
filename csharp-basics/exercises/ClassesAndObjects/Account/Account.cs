@@ -5,41 +5,32 @@ namespace Account
     class Account
     {
         private string _name;
-        private double _money;
+        public double Money;
 
         public Account(string v1, double v2)
         {
             _name = v1;
-            _money = v2;
+            Money = v2;
+        }
+
+        public string Name
+        {
+            get => _name;
         }
 
         public void Withdrawal(double i)
         {
-            _money -= i;
+            Money -= i;
         }
 
         public void Deposit(double i)
         {
-            _money += i;
+            Money += i;
         }
 
         public override string ToString()
         {
-            return $"{_name}: {_money}";
-        }
-
-        public static void Transfer(Account from, Account to, double howMuch)
-        {
-            Console.WriteLine($"From account (before): {from._name}, {from._money}");
-            Console.WriteLine($"To account (before): {to._name}, {to._money}");
-
-            from._money -= howMuch;
-            to._money += howMuch;
-
-            Console.WriteLine();
-            Console.WriteLine($"    From account (after): {from._name}, {from._money}");
-            Console.WriteLine($"    To account (after): {to._name}, {to._money}");
-            Console.WriteLine();
+            return $"{_name}: {Money}";
         }
     }
 }
