@@ -14,22 +14,21 @@ namespace EnergyDrinks
 
         private static void Main(string[] args)
         {
-            //fixme
-            /*
-             Console.WriteLine("Total number of people surveyed " + NumberedSurveyed);
-             Console.WriteLine("Approximately " + energyDrinkers + " bought at least one energy drink");
-             Console.WriteLine(preferCitrus + " of those " + "prefer citrus flavored energy drinks.");
-             */
+            var program = new Program();
+
+            Console.WriteLine("Total number of people surveyed " + NumberedSurveyed);
+            Console.WriteLine("Approximately " + program.CalculateEnergyDrinkers(NumberedSurveyed) + " bought at least one energy drink");
+            Console.WriteLine(program.CalculatePreferCitrus(NumberedSurveyed) + " of those " + "prefer citrus flavored energy drinks.");
         }
 
         double CalculateEnergyDrinkers(int numberSurveyed)
         {
-            throw new Exception("Sorry, no code written :(");
+            return numberSurveyed * PurchasedEnergyDrinks;
         }
 
         double CalculatePreferCitrus(int numberSurveyed)
         {
-            throw new Exception("Sorry, no code written :(");
+            return CalculateEnergyDrinkers(numberSurveyed) * PreferCitrusDrinks;
         }
     }
 }
