@@ -26,7 +26,6 @@ namespace WordCount
             Console.WriteLine($"Words = {wordsCount}");
             Console.WriteLine($"Chars = {charsCount}");
             Console.ReadKey();
-
         }
     }
 }

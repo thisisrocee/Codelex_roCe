@@ -12,7 +12,6 @@ namespace FlightPlanner
         private static void Main(string[] args)
         {
             var readText = File.ReadAllLines(Path);
-
             var userInput = "";
 
             do
