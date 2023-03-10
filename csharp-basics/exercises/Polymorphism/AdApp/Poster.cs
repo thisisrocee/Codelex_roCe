@@ -20,7 +20,8 @@ namespace AdApp
 
         public new int Cost()
         {
-            return base.Cost();
+            var result = _dimensions * 0.2 + _numOfCopies * _costPerCopy;
+            return (int)result;
         }
 
         public override string ToString()
