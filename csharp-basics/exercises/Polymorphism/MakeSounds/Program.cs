@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace MakeSounds
 {
@@ -6,7 +6,17 @@ namespace MakeSounds
     {
         private static void Main(string[] args)
         {
-            
+            var soundsList = new List<ISound>()
+            {
+                new Firework(),
+                new Parrot(),
+                new Radio()
+            };
+
+            foreach (var sounds in soundsList)
+            {
+                sounds.PlaySound();
+            }
         }
     }
 }
