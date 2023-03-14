@@ -8,7 +8,7 @@ namespace Histogram
     {
         private const string Path = "../../midtermscores.txt";
 
-        public static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var readText = File.ReadAllText(Path);
 

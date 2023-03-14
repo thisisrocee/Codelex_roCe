@@ -41,17 +41,7 @@ namespace FlightPlanner
                         Console.Write("Enter starting city: ");
                         var start = Console.ReadLine();
 
-                        foreach (var line in readText)
-                        {
-                            var way = line.Split('-', '>');
-                            var fromCity = way[0].Trim();
-                            var toCity = way[way.Length - 1].Trim();
-
-                            if (fromCity == start)
-                            {
-                                Console.WriteLine(toCity);
-                            }
-                        }
+                        ToCity(readText, start);
 
                         var resultCityList = new List<string> { start };
 
@@ -70,27 +60,34 @@ namespace FlightPlanner
                                 break;
                             }
 
-                            foreach (var line in readText)
-                            {
-                                var way = line.Split('-', '>');
-                                var fromCity = way[0].Trim();
-                                var toCity = way[way.Length - 1].Trim();
-
-                                if (fromCity == nextFlight)
-                                {
-                                    Console.WriteLine(toCity);
-                                }
-                            }
+                            ToCity(readText, nextFlight);
                         }
 
                         Console.WriteLine();
                         Console.WriteLine($"Your round-trip route: {string.Join(" -> ", resultCityList)}");
                         break;
                     }
+
+                    Console.WriteLine("Invalid input");
                 }
             } while (userInput != "#");
 
             Console.ReadKey();
+        }
+
+        public static void ToCity(string[] text, string city)
+        {
+            foreach (var line in text)
+            {
+                var way = line.Split('-', '>');
+                var fromCity = way[0].Trim();
+                var toCity = way[way.Length - 1].Trim();
+
+                if (fromCity == city)
+                {
+                    Console.WriteLine(toCity);
+                }
+            }
         }
     }
 }
