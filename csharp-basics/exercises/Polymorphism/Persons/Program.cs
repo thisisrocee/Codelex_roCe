@@ -1,15 +1,14 @@
-﻿using System;
-
-namespace Persons
+﻿namespace Hierarchy
 {
     class Program
     {
         static void Main(string[] args)
         {
-            /*
-             * - Create an instant of class Student and an instant of class Employee with proper values for the attributes.
-             * - Display the content of each class using Display() method.
-             */
+            var steve = new Employee("Steve", "Jobs", "USA", 12345, "C# developer");
+            var mark = new Student("Mark", "Zucker", "Germany", 67890, 12.5);
+
+            steve.Display();
+            mark.Display();
         }
     }
 }

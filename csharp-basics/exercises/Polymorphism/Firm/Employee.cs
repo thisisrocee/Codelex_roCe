@@ -8,9 +8,6 @@ namespace Firm
 
         protected double payRate;
 
-        //-----------------------------------------------------------------
-        // Sets up an employee with the specified information.
-        //-----------------------------------------------------------------
         public Employee(string eName, string eAddress, string ePhone,
             string socSecNumber, double rate) : base(eName, eAddress, ePhone)
         {
@@ -18,9 +15,6 @@ namespace Firm
             payRate = rate;
         }
 
-        //-----------------------------------------------------------------
-        // Returns information about an employee as a string.
-        //-----------------------------------------------------------------
          public override string ToString() 
         {
              var result = base.ToString();
@@ -28,9 +22,6 @@ namespace Firm
              return result;
          }
 
-        //-----------------------------------------------------------------
-        // Returns the pay rate for this employee.
-        //-----------------------------------------------------------------
         public override double Pay()
         {
             return payRate;

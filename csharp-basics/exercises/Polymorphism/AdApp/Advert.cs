@@ -16,7 +16,7 @@ namespace AdApp
 
         public void SetFee(int fee) 
         {
-            _fee = fee;
+            _fee += fee;
         }
 
         public int Cost() 
