@@ -1,3 +1,3 @@
-﻿// See https://aka.ms/new-console-template for more information
-//ToDo: Write a query that returns names of days
-//https://docs.microsoft.com/en-us/dotnet/api/system.dayofweek?view=net-6.0
+﻿var namesOfDays = Enumerable.Range(0, 7).Select(i => ((DayOfWeek)i).ToString()).ToList();
+
+Console.WriteLine(string.Join(", ", namesOfDays));
