@@ -16,18 +16,27 @@ static string Moran(int num)
     if (num % sum == 0)
     {
         var result = num / sum;
-        if (IsPrime(result))
-            return "M";
-        return "H";
+
+        return IsPrime(result) ? "M" : "H";
     }
+
     return "Neither";
 }
 
 static bool IsPrime(int num)
 {
-    if (num < 2) return false;
+    if (num < 2)
+    {
+        return false;
+    }
+
     for (var i = 2; i <= Math.Sqrt(num); i++)
+    {
         if (num % i == 0)
+        {
             return false;
+        }
+    }
+
     return true;
 }

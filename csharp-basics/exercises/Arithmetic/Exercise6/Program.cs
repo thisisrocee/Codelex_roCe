@@ -38,6 +38,8 @@ for (var i = min; i <= max; i += columns)
                 break;
         }
     }
+
     Console.WriteLine();
 }
+
 Console.ReadKey();
