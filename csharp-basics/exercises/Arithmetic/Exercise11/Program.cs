@@ -16,8 +16,16 @@ static string Moran(int num)
     if (num % sum == 0)
     {
         var result = num / sum;
+<<<<<<< HEAD
 
         return IsPrime(result) ? "M" : "H";
+=======
+        if (IsPrime(result))
+        {
+            return "M";
+        }
+        return "H";
+>>>>>>> 2b4551c0b0fdcc21e1ed954b9ebf842d84fb24b3
     }
 
     return "Neither";
@@ -29,7 +37,10 @@ static bool IsPrime(int num)
     {
         return false;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2b4551c0b0fdcc21e1ed954b9ebf842d84fb24b3
     for (var i = 2; i <= Math.Sqrt(num); i++)
     {
         if (num % i == 0)
@@ -37,6 +48,9 @@ static bool IsPrime(int num)
             return false;
         }
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2b4551c0b0fdcc21e1ed954b9ebf842d84fb24b3
     return true;
 }

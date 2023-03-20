@@ -27,7 +27,7 @@ namespace CalculateArea
                 else if (userChoice == 2)
                     CalculateRectangleArea();
                 else if (userChoice == 3) CalculateTriangleArea();
-                break;
+                else if (userChoice == 4) break;
             }
             return userChoice;
         }
