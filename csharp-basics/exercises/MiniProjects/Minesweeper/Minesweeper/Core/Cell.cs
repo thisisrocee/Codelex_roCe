@@ -26,7 +26,6 @@ namespace Minesweeper.Core
 
         public void SetupDesign()
         {
-            //BackColor = SystemColors.ButtonFace;
             Location = new Point(XLoc * CellSize, YLoc * CellSize);
             Size = new Size(CellSize, CellSize);
             UseVisualStyleBackColor = false;

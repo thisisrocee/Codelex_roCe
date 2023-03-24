@@ -9,6 +9,7 @@ namespace Minesweeper
     {
         private int _startTime;
         private Minesweeper _game;
+
         public Minesweeper()
         {
             InitializeComponent();
