@@ -23,6 +23,7 @@ namespace VendingMachine
         public void DisplayProduct()
         {
             var count = 1;
+
             foreach (var product in _productsList)
             {
                 if (product.Available < 1)
@@ -113,12 +114,12 @@ namespace VendingMachine
             {
                 throw new InvalidAmountException();
             }
-            
+
             if (string.IsNullOrEmpty(name))
             {
                 throw new InvalidNameExecption();
             }
-            
+
             if (productNumber <= 0 || productNumber > Products.Length)
             {
                 Console.WriteLine($"Invalid product number: {productNumber}.");

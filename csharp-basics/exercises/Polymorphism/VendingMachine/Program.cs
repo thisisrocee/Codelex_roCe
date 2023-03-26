@@ -15,7 +15,6 @@ namespace VendingMachine
             machine.AddProduct("Soda", new Money { Euros = 1, Cents = 50 }, 5);
             machine.AddProduct("Chips", new Money { Euros = 2, Cents = 0 }, 3);
             machine.AddProduct("Candy", new Money { Euros = 0, Cents = 50 }, 10);
-            // machine.AddProduct("Soda", new Money { Euros = 1, Cents = 50 }, 1);
             machine.AddProduct("Prime", new Money { Euros = 2, Cents = 0 }, 3);
             machine.AddProduct("Nuts", new Money { Euros = 0, Cents = 90 }, 10);
             Console.WriteLine();
@@ -41,24 +40,25 @@ namespace VendingMachine
                     {
                         Console.WriteLine("How many you need:");
                         count = int.Parse(Console.ReadLine());
-                        
-                        if (count > machine.Products[productNumber-1].Available)
+
+                        if (count > machine.Products[productNumber - 1].Available)
                         {
                             Console.WriteLine($"Not enough number {productNumber} products in {manufacturer}");
                             continue;
                         }
-                        
+
                         if (count < 0)
                         {
                             Console.WriteLine($"Number is negative, Try Again!");
                             Console.WriteLine();
                             continue;
                         }
-                        
+
                         validInput = true;
-                    } 
-                    
+                    }
+
                     var answer = "";
+                    
                     while (answer != "n")
                     {
                         Console.WriteLine("Insert Euros!");
