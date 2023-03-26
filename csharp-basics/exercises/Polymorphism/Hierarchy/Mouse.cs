@@ -24,6 +24,16 @@ namespace Hierarchy
 
         public override bool CanEat(string foodType)
         {
+            if (string.IsNullOrEmpty(foodType))
+            {
+                throw new InvalidFoodNameException();
+            }
+            
+            if (foodType != "Vegetable")
+            {
+                throw new IncorrectFoodException();
+            }
+            
             return foodType == "Vegetable";
         }
     }

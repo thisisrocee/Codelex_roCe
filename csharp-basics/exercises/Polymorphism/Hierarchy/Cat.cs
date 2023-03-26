@@ -7,7 +7,7 @@ namespace Hierarchy
 {
     public class Cat : Felime
     {
-        private string _breed;
+        public string _breed;
 
         public Cat(string animalType, string animalName, double animalWeight,
             string livingRegion, string breed) : base(animalType, animalName, animalWeight, livingRegion)
@@ -32,6 +32,11 @@ namespace Hierarchy
 
         public override bool CanEat(string foodType)
         {
+            if (string.IsNullOrEmpty(foodType))
+            {
+                throw new InvalidFoodNameException();
+            }
+
             return foodType == "Meat" || foodType == "Vegetable";
         }
     }
