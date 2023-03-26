@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VendingMachine
 {
     public class VendingMachine : IVendingMachine
     {
         public string Manufacturer { get; }
-        public bool HasProducts => Array.Exists(Products, p => p.Available > 0);
+        public bool HasProducts => _productsList.Any(p => p.Available > 0);
         public Money Amount { get; private set; }
         public Product[] Products { get; set; }
         private List<Product> _productsList;
@@ -14,9 +15,9 @@ namespace VendingMachine
         public VendingMachine(string manufacturer)
         {
             Manufacturer = manufacturer;
-            Products = Array.Empty<Product>();
+            _productsList = new List<Product>();
+            Products = _productsList.ToArray();
             Amount = new Money { Euros = 0, Cents = 0 };
-            _productsList = new List<Product>(Products);
         }
 
         public void DisplayProduct()
@@ -30,19 +31,21 @@ namespace VendingMachine
                 }
                 else
                 {
-                    Console.WriteLine($"{count} ========== {product.Name} for {product.Price.Euros}.{product.Price.Cents}.");
+                    Console.WriteLine(
+                        $"{count} ========== {product.Name} for {product.Price.Euros}.{product.Price.Cents}.");
                 }
+
                 count++;
             }
         }
 
         public Money InsertCoin(Money amount)
         {
-            if (amount.Cents != 10 && amount.Cents != 20 && amount.Cents != 50 && amount.Cents != 0 
-                && amount.Euros != 0 && amount.Euros != 1 && amount.Euros != 2)
+            if (InvalidCoin(amount))
             {
                 Console.WriteLine($"Invalid coin: {amount.Euros}.{amount.Cents}.");
-                return new Money();
+
+                throw new InvalidCoinException();
             }
 
             Amount = new Money
@@ -54,19 +57,41 @@ namespace VendingMachine
             return Amount;
         }
 
+        private bool InvalidCoin(Money amount)
+        {
+            return amount.Cents != 10 && amount.Cents != 20 && amount.Cents != 50 && amount.Cents != 0
+                   && amount.Euros != 0 && amount.Euros != 1 && amount.Euros != 2;
+        }
+
         public Money ReturnMoney()
         {
+            Amount = new Money();
             var amount = Amount;
-            Amount = new Money { Euros = 0, Cents = 0 };
             return amount;
         }
 
         public bool AddProduct(string name, Money price, int count)
         {
-            if (Array.Exists(Products, p => p.Name == name))
+            if (count < 0)
+            {
+                throw new InvalidAmountException();
+            }
+
+            if (InvalidCoin(price))
+            {
+                throw new InvalidCoinException();
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new InvalidNameExecption();
+            }
+
+            if (Products.Any(p => p.Name == name))
             {
                 Console.WriteLine($"Product {name} already exists.");
-                return false;
+
+                throw new DuplicateProductExecption();
             }
 
             _productsList.Add(new Product
@@ -76,48 +101,62 @@ namespace VendingMachine
                 Available = count
             });
 
+            Products = _productsList.ToArray();
+
             Console.WriteLine($"Product {name} added successfully.");
             return true;
         }
 
         public bool UpdateProduct(int productNumber, string name, Money? price, int amount)
         {
-            if (productNumber <= 0 || productNumber > _productsList.Count)
+            if (amount <= 0)
+            {
+                throw new InvalidAmountException();
+            }
+            
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new InvalidNameExecption();
+            }
+            
+            if (productNumber <= 0 || productNumber > Products.Length)
             {
                 Console.WriteLine($"Invalid product number: {productNumber}.");
-                return false;
+
+                throw new InvalidProductNumberException();
             }
 
-            var product = _productsList[productNumber - 1];
+            var product = Products[productNumber - 1];
 
             if (!HasProducts)
             {
                 Console.WriteLine($"Product {product.Name} is sold out.");
-                return false;
+
+                throw new ProductSoldOutException();
             }
 
-            Console.WriteLine($"Purchase of product {name} successful!");
-            Console.WriteLine($"{product.Name} for {product.Price.Euros}.{product.Price.Cents}.");
+            var totalAmount = Amount.Euros * 100 + Amount.Cents;
+            var totalPrice = (product.Price.Euros * 100 + product.Price.Cents) * amount;
 
-            var totalAmount  = Amount.Euros * 100 + Amount.Cents;
-            var totalPrice = product.Price.Euros * 100 + product.Price.Cents;
-
-            if (totalAmount >= totalPrice)
-            {
-                var change = totalAmount - totalPrice;
-
-                Amount = new Money
-                {
-                    Euros = change / 100,
-                    Cents = change % 100
-                };
-            }
-            else
+            if (totalAmount < totalPrice)
             {
                 Console.WriteLine("You do not have enough money to buy this product.");
+
+                throw new InsufficientFundsException();
             }
 
-            product.Available--;
+            var change = totalAmount - totalPrice;
+
+            Amount = new Money
+            {
+                Euros = change / 100,
+                Cents = change % 100
+            };
+
+            Console.WriteLine($"Purchase of {amount} {(amount == 1 ? "product" : "products")} successful!");
+            Console.WriteLine($"{amount} {product.Name} for {product.Price.Euros}.{product.Price.Cents}.");
+
+            Products[productNumber - 1].Available -= amount;
 
             return true;
         }
