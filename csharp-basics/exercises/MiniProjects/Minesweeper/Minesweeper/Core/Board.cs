@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Minesweeper.Core
 {
@@ -13,31 +11,46 @@ namespace Minesweeper.Core
         public int Width { get; set; }
         public int Height { get; set; }
         public int NumMines { get; set; }
+        public int NumCells { get; set; }
         public Cell[,] Cells { get; set; }
 
         public Board(Minesweeper minesweeper, int width, int height, int mines)
         {
-            this.Minesweeper = minesweeper;
-            this.Width = width;
-            this.Height = height;
-            this.NumMines = mines;
-            this.Cells = new Cell[width, height];
+            Minesweeper = minesweeper;
+            Width = width;
+            Height = height;
+            NumMines = mines;
+            Cells = new Cell[width, height];
         }
 
         public void SetupBoard()
         {
-            var c = new Cell
+            for (var i = 0; i < Width; i++)
             {
-                CellState = CellState.Closed,
-                CellType = CellType.Regular,
-                CellSize = 50,
-                Board = this
-            };
-            c.SetupDesign();
-            c.MouseDown += Cell_MouseClick;
+                for (var j = 0; j < Height; j++)
+                {
+                    var c = new Cell
+                    {
+                        XLoc = i,
+                        YLoc = j,
+                        CellState = CellState.Closed,
+                        CellType = CellType.Regular,
+                        CellSize = 40,
+                        Board = this
+                    };
 
-            this.Cells[0, 0] = c;
-            this.Minesweeper.Controls.Add(c);
+                    c.SetupDesign();
+                    c.MouseDown += Cell_MouseClick;
+                    c.Top += 70;
+
+                    NumCells++;
+
+                    Cells[i, j] = c;
+                    Minesweeper.Controls.Add(c);
+                }
+            }
+
+            NumCells -= NumMines;
         }
 
         private void Cell_MouseClick(object sender, MouseEventArgs e)
@@ -50,17 +63,83 @@ namespace Minesweeper.Core
             switch (e.Button)
             {
                 case MouseButtons.Left:
+                    Minesweeper.timer1.Enabled = true;
                     cell.OnClick();
                     break;
 
                 case MouseButtons.Right:
                     cell.OnFlag();
+                    Minesweeper.bombLabel.Text = NumMines.ToString();
                     break;
 
                 default:
                     return;
             }
+        }
 
+        public void PlaceMines()
+        {
+            var random = new Random();
+            var mineCount = 0;
+
+            while (mineCount < NumMines)
+            {
+                var x = random.Next(Width);
+                var y = random.Next(Height);
+
+                if (Cells[x, y].CellType != CellType.Mine)
+                {
+                    Cells[x, y].CellType = CellType.Mine;
+                    mineCount++;
+                }
+            }
+        }
+
+        public bool EndGame(bool win)
+        {
+            Minesweeper.timer1.Stop();
+            NumMines = 0;
+            Minesweeper.bombLabel.Text = NumMines.ToString();
+
+            foreach (var cell in Cells)
+            {
+                if (cell.CellType == CellType.Mine || cell.CellType == CellType.FlaggedMine)
+                {
+                    cell.CellState = CellState.Opened;
+                    cell.Text = "@";
+                    cell.ForeColor = Color.Black;
+                }
+                else
+                {
+                    cell.CountMinesAround();
+
+                    cell.CellState = CellState.Opened;
+                    cell.BackColor = Color.LightGray;
+                    cell.UseVisualStyleBackColor = true;
+
+                    if (cell.NumMinesAround == 0)
+                    {
+                        cell.IterateNeighbors(c =>
+                        {
+                            if (c.CellState == CellState.Closed)
+                            {
+                                c.OnClick(true);
+                            }
+                        });
+                    }
+                }
+            }
+
+            if (win)
+            {
+                MessageBox.Show("Congratulations, you won!");
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Sorry, you lost.");
+                return false;
+            }
         }
     }
 }
