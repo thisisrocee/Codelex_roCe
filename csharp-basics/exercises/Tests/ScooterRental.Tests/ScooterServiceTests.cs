@@ -1,5 +1,9 @@
 using FluentAssertions;
 using Moq.AutoMock;
+using ScooterRental.Exceptions;
+using ScooterRental.Interfaces;
+using ScooterRental.Models;
+using ScooterRental.Services;
 
 namespace ScooterRental.Tests
 {

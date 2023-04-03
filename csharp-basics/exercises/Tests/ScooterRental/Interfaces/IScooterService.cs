@@ -1,4 +1,6 @@
-﻿namespace ScooterRental
+﻿using ScooterRental.Models;
+
+namespace ScooterRental.Interfaces
 {
     public interface IScooterService
     {

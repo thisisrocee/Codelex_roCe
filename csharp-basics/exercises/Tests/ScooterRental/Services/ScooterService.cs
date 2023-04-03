@@ -1,4 +1,8 @@
-﻿namespace ScooterRental
+﻿using ScooterRental.Exceptions;
+using ScooterRental.Interfaces;
+using ScooterRental.Models;
+
+namespace ScooterRental.Services
 {
     public class ScooterService : IScooterService
     {
