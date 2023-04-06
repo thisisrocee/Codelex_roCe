@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using Moq.AutoMock;
 using ScooterRental.Exceptions;
 using ScooterRental.Interfaces;
@@ -11,44 +12,18 @@ namespace ScooterRental.Tests
     {
         private IRentalCompany _rentalCompany;
         private AutoMocker _mocker;
-        private List<Scooter> _scooter;
-        private Scooter _testScooter1;
-        private Scooter _testScooter2;
-        private Scooter _testScooter3;
 
         [SetUp]
         public void Setup()
         {
             _mocker = new AutoMocker();
-            _scooter = new List<Scooter>();
-            _rentalCompany = new RentalCompany("Bolt", _mocker.GetMock<IScooterService>().Object, _scooter);
-            _testScooter1 = new Scooter("1", 1m);
-            _testScooter2 = new Scooter("2", 1m);
-            _testScooter3 = new Scooter("3", 1m);
-        }
-
-        private void GetScooter(Scooter scooter)
-        {
-            var mock = _mocker.GetMock<IScooterService>();
-            mock.Setup(x => x.GetScooterById(_testScooter1.Id)).Returns(_testScooter1);
+            _rentalCompany = new RentalCompany("Bolt", _mocker.GetMock<IScooterService>().Object, _mocker.GetMock<IRentalArchive>().Object);
         }
 
         [Test]
         public void Name_CompanyNameReturned()
         {
             _rentalCompany.Name.Should().Be("Bolt");
-        }
-
-        [Test]
-        public void StartRent_ValidIdProvided_ScooterIsRented()
-        {
-            var mock = _mocker.GetMock<IScooterService>();
-            mock.Setup(x => x.GetScooterById(_testScooter1.Id)).Returns(_testScooter1);
-
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-
-            _testScooter1.IsRented.Should().BeTrue();
         }
 
         [Test]
@@ -79,73 +54,41 @@ namespace ScooterRental.Tests
         }
 
         [Test]
-        public void StartRent_ValidIdProvidedButLimitExceededAndTriedSameDay_ThrowsSameDayRentingException()
+        public void StartRent_ValidIdProvided_ScooterIsRented()
         {
+            var scooter = new Scooter("1", 1m);
+
             var mock = _mocker.GetMock<IScooterService>();
-            mock.Setup(x => x.GetScooterById(_testScooter1.Id)).Returns(_testScooter1);
+            mock.Setup(x => x.GetScooterById("1")).Returns(scooter);
 
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
+            _rentalCompany.StartRent("1");
 
-            _testScooter1.EndDate = new DateTime(2023, 2, 20, 10, 30, 0);
-            _rentalCompany.EndRent(_testScooter1.Id).Should().Be(20m);
-            _testScooter1.IsRented.Should().BeFalse();
+            var mock1 = _mocker.GetMock<IRentalArchive>();
+            mock1.Verify(s => s.AddRent("1", 1m, It.IsAny<DateTime>()), Times.Once);
 
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 11,0, 0);
-
-            Action act = () => _rentalCompany.StartRent(_testScooter1.Id);
-
-            act.Should().Throw<LimitExceededException>();
+            scooter.IsRented.Should().BeTrue();
         }
 
         [Test]
-        public void StartRent_ValidIdProvidedButLimitExceededAndTriedOtherDay_ThrowsSameDayRentingException()
+        public void EndRent_ValidIdProvided_ScooterRentEnded()
         {
-            var mock = _mocker.GetMock<IScooterService>();
-            mock.Setup(x => x.GetScooterById(_testScooter1.Id)).Returns(_testScooter1);
+            var scooter = new Scooter("1", 1m) { IsRented = true };
 
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter1.IsRented.Should().BeTrue();
+            var rentedScooter = new RentedScooter(scooter.Id, scooter.PricePerMinute, DateTime.Now.AddMinutes(-25))
+            {
+                RentCompleted = DateTime.Now
+            };
 
-            _testScooter1.EndDate = new DateTime(2023, 2, 20, 10, 30, 0);
-            _rentalCompany.EndRent(_testScooter1.Id).Should().Be(20m);
-            _testScooter1.IsRented.Should().BeFalse();
+            _mocker.GetMock<IScooterService>()
+                .Setup(s => s.GetScooterById(scooter.Id)).Returns(scooter);
 
-            _testScooter1.StartDate = new DateTime(2023, 2, 21, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
+            _mocker.GetMock<IRentalArchive>()
+                .Setup(s => s.EndRent(scooter.Id, It.IsAny<DateTime>())).Returns(rentedScooter);
 
-            _testScooter1.IsRented.Should().BeTrue();
-        }
+            _mocker.GetMock<IRentalCalculator>().Setup(s => s.CalculateRent(rentedScooter)).Returns(20m);
 
-        [Test]
-        public void EndRent_ValidIdAndMinutesRentedProvided_ScooterRentEnded()
-        {
-            var mock = _mocker.GetMock<IScooterService>();
-            mock.Setup(x => x.GetScooterById(_testScooter1.Id)).Returns(_testScooter1);
-
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 23, 30, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-
-            _testScooter1.EndDate = new DateTime(2023, 2, 22, 0, 20, 0);
-            _rentalCompany.EndRent(_testScooter1.Id).Should().Be(60m);
-
-            _testScooter1.IsRented.Should().BeFalse();
-        }
-
-        [Test]
-        public void EndRent_ValidIdProvidedAndLimitExceeded_ScooterRentEndedButStoppedAtLimit()
-        {
-            var mock = _mocker.GetMock<IScooterService>();
-            mock.Setup(x => x.GetScooterById(_testScooter1.Id)).Returns(_testScooter1);
-
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-
-            _testScooter1.EndDate = new DateTime(2023, 2, 20, 10, 30, 0);
-            _rentalCompany.EndRent(_testScooter1.Id).Should().Be(20m);
-
-            _testScooter1.IsRented.Should().BeFalse();
+            _rentalCompany.EndRent(scooter.Id).Should().Be(20m);
+            scooter.IsRented.Should().BeFalse();
         }
 
         [Test]
@@ -176,154 +119,77 @@ namespace ScooterRental.Tests
         }
 
         [Test]
-        public void CalculateIncome_NegativeYearProvidedAndNonCompletedRentalsNotIncluded_ThrowsInvalidYearException()
+        public void CalculateIncome_YearNotProvidedAndNonCompletedRentalsNotIncluded_ReturnsTotalIncome()
         {
-            _scooter.Add(_testScooter1);
-            Action act = () => _rentalCompany.CalculateIncome(-1, false);
+            var rentals = new List<RentedScooter>();
 
-            act.Should().Throw<InvalidYearException>();
-        }
+            _mocker.GetMock<IRentalArchive>().Setup(s => s.GetRentedScooters()).Returns(rentals);
 
-        [Test]
-        public void CalculateIncome_YearProvidedAndNonCompletedRentalsNotIncluded_ReturnsTotalIncome()
-        {
-            _scooter.Add(_testScooter1);
-            _scooter.Add(_testScooter2);
-            _scooter.Add(_testScooter3);
+            _mocker.GetMock<IRentalCalculator>().Setup(s => s.CalculateIncome(rentals)).Returns(0);
 
-            GetScooter(_testScooter1);
-            GetScooter(_testScooter2);
-            GetScooter(_testScooter3);
-
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter2.StartDate = new DateTime(2023, 2, 20, 11, 0, 0);
-            _rentalCompany.StartRent(_testScooter2.Id);
-            _testScooter3.StartDate = new DateTime(2023, 2, 20, 12, 0, 0);
-            _rentalCompany.StartRent(_testScooter3.Id);
-
-            _rentalCompany.EndRent(_testScooter1.Id);
-            _rentalCompany.EndRent(_testScooter2.Id);
-            _rentalCompany.EndRent(_testScooter3.Id);
-
-            _rentalCompany.CalculateIncome(2023, false).Should().Be(45m);
-        }
-
-        [Test]
-        public void CalculateIncome_YearProvidedAndNonCompletedRentalsIncluded_ReturnsTotalIncome()
-        {
-            _scooter.Add(_testScooter1);
-            _scooter.Add(_testScooter2);
-            _scooter.Add(_testScooter3);
-
-            GetScooter(_testScooter1);
-            GetScooter(_testScooter2);
-            GetScooter(_testScooter3);
-
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter2.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter2.Id);
-            _testScooter3.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter3.Id);
-
-            _rentalCompany.CalculateIncome(2023, true).Should().Be(45m);
-        }
-
-        [Test]
-        public void CalculateIncome_YearNotProvidedAndCompletedRentalsNotIncluded_ReturnsTotalIncome()
-        {
-            _scooter.Add(_testScooter1);
-            _scooter.Add(_testScooter2);
-            _scooter.Add(_testScooter3);
-
-            GetScooter(_testScooter1);
-            GetScooter(_testScooter2);
-            GetScooter(_testScooter3);
-
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter2.StartDate = new DateTime(2022, 2, 20, 11, 0, 0);
-            _rentalCompany.StartRent(_testScooter2.Id);
-            _testScooter3.StartDate = new DateTime(2021, 2, 20, 12, 0, 0);
-            _rentalCompany.StartRent(_testScooter3.Id);
-
-            _rentalCompany.EndRent(_testScooter1.Id);
-            _rentalCompany.EndRent(_testScooter2.Id);
-            _rentalCompany.EndRent(_testScooter3.Id);
-
-            _rentalCompany.CalculateIncome(null, false).Should().Be(45m);
+            _rentalCompany.CalculateIncome(null, false).Should().Be(0);
         }
 
         [Test]
         public void CalculateIncome_YearNotProvidedAndNonCompletedRentalsIncluded_ReturnsTotalIncome()
         {
-            _scooter.Add(_testScooter1);
-            _scooter.Add(_testScooter2);
-            _scooter.Add(_testScooter3);
+            var rentals = new List<RentedScooter>();
 
-            GetScooter(_testScooter1);
-            GetScooter(_testScooter2);
-            GetScooter(_testScooter3);
+            var rent = new RentedScooter("1", 1m, DateTime.Now.AddMinutes(-5)) { RentCompleted = DateTime.Now };
+            var rent1 = new RentedScooter("1", 1m, new DateTime(2022, 10, 2, 2, 0, 0))
+            {
+                RentCompleted = new DateTime(2022, 10, 4, 2, 0, 0)
+            };
+            rentals.Add(rent);
+            rentals.Add(rent1);
 
-            _testScooter1.StartDate = new DateTime(2023, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter2.StartDate = new DateTime(2022, 2, 20, 11, 0, 0);
-            _rentalCompany.StartRent(_testScooter2.Id);
-            _testScooter3.StartDate = new DateTime(2021, 2, 20, 12, 0, 0);
-            _rentalCompany.StartRent(_testScooter3.Id);
+            _mocker.GetMock<IRentalArchive>().Setup(s => s.GetRentedScooters()).Returns(rentals);
 
-            _rentalCompany.CalculateIncome(null, true).Should().Be(45m);
+            _mocker.GetMock<IRentalCalculator>().Setup(s => s.CalculateIncome(rentals)).Returns(65m);
+
+            _rentalCompany.CalculateIncome(null, true).Should().Be(65m);
         }
 
         [Test]
-        public void CalculateIncome_YearProvidedAndNonCompletedRentalsIncludedButNoExactYearRecord_ThrowsNoScooterByGivenYearException()
+        public void CalculateIncome_YearProvidedAndNonCompletedRentalsNotIncluded_ReturnsTotalIncome()
         {
-            _scooter.Add(_testScooter1);
-            _scooter.Add(_testScooter2);
-            _scooter.Add(_testScooter3);
+            var rentals = new List<RentedScooter>();
 
-            GetScooter(_testScooter1);
-            GetScooter(_testScooter2);
-            GetScooter(_testScooter3);
+            var rent = new RentedScooter("1", 1m, DateTime.Now.AddMinutes(-5)) { RentCompleted = DateTime.Now };
+            var rent1 = new RentedScooter("1", 1m, DateTime.Now.AddMinutes(-5)) { RentCompleted = DateTime.Now };
+            rentals.Add(rent);
+            rentals.Add(rent1);
 
-            _testScooter1.StartDate = new DateTime(2022, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter2.StartDate = new DateTime(2022, 2, 20, 11, 0, 0);
-            _rentalCompany.StartRent(_testScooter2.Id);
-            _testScooter3.StartDate = new DateTime(2022, 2, 20, 12, 0, 0);
-            _rentalCompany.StartRent(_testScooter3.Id);
+            _mocker.GetMock<IRentalArchive>().Setup(s => s.GetRentedScooters()).Returns(rentals);
 
-            _rentalCompany.CalculateIncome(2023, true).Should().Be(0m);
+            _mocker.GetMock<IRentalCalculator>().Setup(s => s.CalculateIncome(rentals)).Returns(10m);
+
+            _rentalCompany.CalculateIncome(2023, false).Should().Be(10m);
         }
 
         [Test]
-        public void CalculateIncome_YearProvidedAndNonCompletedRentalsNotIncludedButNoExactYearRecord_ThrowsNoScooterByGivenYearException()
+        public void CalculateIncome_YearProvidedAndNonCompletedRentalsIncluded_ReturnsTotalIncome()
         {
-            _scooter.Add(_testScooter1);
-            _scooter.Add(_testScooter2);
-            _scooter.Add(_testScooter3);
+            var rentals = new List<RentedScooter>();
 
-            GetScooter(_testScooter1);
-            GetScooter(_testScooter2);
-            GetScooter(_testScooter3);
+            var rent = new RentedScooter("1", 1m, DateTime.Now.AddMinutes(-5)) { RentCompleted = DateTime.Now };
+            var rent1 = new RentedScooter("1", 1m, DateTime.Now.AddMinutes(-5));
+            rentals.Add(rent);
+            rentals.Add(rent1);
 
-            _testScooter1.StartDate = new DateTime(2022, 2, 20, 10, 0, 0);
-            _rentalCompany.StartRent(_testScooter1.Id);
-            _testScooter2.StartDate = new DateTime(2022, 2, 20, 11, 0, 0);
-            _rentalCompany.StartRent(_testScooter2.Id);
-            _testScooter3.StartDate = new DateTime(2022, 2, 20, 12, 0, 0);
-            _rentalCompany.StartRent(_testScooter3.Id);
-            
-            _rentalCompany.CalculateIncome(2023, false).Should().Be(0m);
+            _mocker.GetMock<IRentalArchive>().Setup(s => s.GetRentedScooters()).Returns(rentals);
+
+            _mocker.GetMock<IRentalCalculator>().Setup(s => s.CalculateIncome(rentals)).Returns(10m);
+
+            _rentalCompany.CalculateIncome(2023, true).Should().Be(10m);
         }
 
         [Test]
-        public void CalculateIncome_YearNotProvidedAndNonCompletedRentalsNotIncludedAndNoRentalsProvided_ThrowsScootersNotFoundException()
+        public void CalculateIncome_NegativeYearProvided_ThrowsInvalidYearException()
         {
-            Action act = () => _rentalCompany.CalculateIncome(null, false);
+            Action act = () => _rentalCompany.CalculateIncome(-1, false);
 
-            act.Should().Throw<ScooterNotFoundException>();
+            act.Should().Throw<InvalidYearException>();
         }
     }
 }
