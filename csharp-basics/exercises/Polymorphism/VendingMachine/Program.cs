@@ -15,7 +15,6 @@ namespace VendingMachine
             machine.AddProduct("Soda", new Money { Euros = 1, Cents = 50 }, 5);
             machine.AddProduct("Chips", new Money { Euros = 2, Cents = 0 }, 3);
             machine.AddProduct("Candy", new Money { Euros = 0, Cents = 50 }, 10);
-            machine.AddProduct("Soda", new Money { Euros = 1, Cents = 50 }, 1);
             machine.AddProduct("Prime", new Money { Euros = 2, Cents = 0 }, 3);
             machine.AddProduct("Nuts", new Money { Euros = 0, Cents = 90 }, 10);
             Console.WriteLine();
@@ -35,23 +34,46 @@ namespace VendingMachine
                     machine.DisplayProduct();
                     var productNumber = int.Parse(Console.ReadLine());
 
-                    Console.WriteLine("Insert Euros!");
-                    var euros = int.Parse(Console.ReadLine());
-                    Console.WriteLine("Insert Cents!");
-                    var cents = int.Parse(Console.ReadLine());
-
-                    var insertedMoney = new Money { Euros = euros, Cents = cents };
-                    var insertedAmount = machine.InsertCoin(insertedMoney);
-
-                    if (insertedAmount.Euros == 0 && insertedAmount.Cents == 0)
+                    var validInput = false;
+                    var count = 0;
+                    while (!validInput)
                     {
-                        Console.WriteLine("Invalid coin inserted. Press Any key to try again.");
-                        Console.ReadLine();
-                        Console.Clear();
-                        continue;
+                        Console.WriteLine("How many you need:");
+                        count = int.Parse(Console.ReadLine());
+
+                        if (count > machine.Products[productNumber - 1].Available)
+                        {
+                            Console.WriteLine($"Not enough number {productNumber} products in {manufacturer}");
+                            continue;
+                        }
+
+                        if (count < 0)
+                        {
+                            Console.WriteLine($"Number is negative, Try Again!");
+                            Console.WriteLine();
+                            continue;
+                        }
+
+                        validInput = true;
                     }
 
-                    machine.UpdateProduct(productNumber, $"{productNumber}", insertedMoney, 1);
+                    var answer = "";
+                    
+                    while (answer != "n")
+                    {
+                        Console.WriteLine("Insert Euros!");
+                        var euros = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Insert Cents!");
+                        var cents = int.Parse(Console.ReadLine());
+
+                        var insertedMoney = new Money { Euros = euros, Cents = cents };
+                        machine.InsertCoin(insertedMoney);
+
+                        Console.WriteLine("Want to insert more? y/n");
+                        answer = Console.ReadLine();
+                    }
+
+                    machine.UpdateProduct(productNumber, $"{productNumber}", null, count);
 
                     Console.WriteLine($"Your returned balance: {machine.Amount.Euros}.{machine.Amount.Cents}");
 
